@@ -23,21 +23,16 @@
  * THE SOFTWARE.
  */
 
-
 var igv = (function (igv) {
 
     var alignmentRowYInset = 0;
     var alignmentStartGap = 5;
     var downsampleRowHeight = 5;
     const DEFAULT_COVERAGE_TRACK_HEIGHT = 50;
-    const DEFAULT_TRACK_HEIGHT = 300;
 
     igv.BAMTrack = function (config) {
 
         this.featureSource = new igv.BamSource(config);
-
-        // Override default track height for bams
-        if(config.height === undefined) config.height = DEFAULT_TRACK_HEIGHT;
 
         igv.configTrack(this, config);
 
@@ -693,7 +688,7 @@ var igv = (function (igv) {
         function drawPairConnector(alignment, yRect, alignmentHeight) {
 
             var alignmentColor = getAlignmentColor.call(self, alignment.firstAlignment),
-                outlineColor = 'alignmentColor',
+                outlineColor = alignmentColor,
                 xBlockStart = (alignment.connectingStart - bpStart) / bpPerPixel,
                 xBlockEnd = (alignment.connectingEnd - bpStart) / bpPerPixel,
                 yStrokedLine = yRect + alignmentHeight / 2;
@@ -715,7 +710,7 @@ var igv = (function (igv) {
         function drawSingleAlignment(alignment, yRect, alignmentHeight) {
 
             var alignmentColor = getAlignmentColor.call(self, alignment),
-                outlineColor = 'alignmentColor',
+                outlineColor = alignmentColor,
                 lastBlockEnd,
                 blocks = alignment.blocks,
                 block,
@@ -784,7 +779,6 @@ var igv = (function (igv) {
                 lastBlockEnd = xBlockEnd;
 
                 if (true === alignment.strand && b === blocks.length - 1) {
-                    // Last block on + strand
                     x = [
                         xBlockStart,
                         xBlockEnd,
@@ -799,19 +793,8 @@ var igv = (function (igv) {
                         yRect + alignmentHeight,
                         yRect + alignmentHeight,
                         yRect];
-
-                    igv.graphics.fillPolygon(ctx, x, y, { fillStyle: alignmentColor });
-
-                    if (self.highlightedAlignmentReadNamed === alignment.readName) {
-                        igv.graphics.strokePolygon(ctx, x, y, { strokeStyle: 'red' });
-                    }
-
-                    if (alignment.mq <= 0) {
-                        igv.graphics.strokePolygon(ctx, x, y, {strokeStyle: outlineColor});
-                    }
-                }
-                else if (false === alignment.strand && b === 0) {
-                    // First block on - strand
+                    drawStrandedPolygon(x, y, alignment, (self.highlightedAlignmentReadNamed === alignment.readName));
+                } else if (false === alignment.strand && b === 0) {
                     x = [
                         xBlockEnd,
                         xBlockStart,
@@ -826,18 +809,8 @@ var igv = (function (igv) {
                         yRect + alignmentHeight,
                         yRect + alignmentHeight,
                         yRect];
-
-                    igv.graphics.fillPolygon(ctx, x, y, {fillStyle: alignmentColor});
-
-                    if (self.highlightedAlignmentReadNamed === alignment.readName) {
-                        igv.graphics.strokePolygon(ctx, x, y, { strokeStyle: 'red' });
-                    }
-
-                    if (alignment.mq <= 0) {
-                        igv.graphics.strokePolygon(ctx, x, y, {strokeStyle: outlineColor});
-                    }
-                }
-                else {
+                    drawStrandedPolygon(x, y, alignment, (self.highlightedAlignmentReadNamed === alignment.readName));
+                } else {
                     igv.graphics.fillRect(ctx, xBlockStart, yRect, widthBlock, alignmentHeight, {fillStyle: alignmentColor});
                     if (alignment.mq <= 0) {
                         ctx.save();
@@ -846,6 +819,7 @@ var igv = (function (igv) {
                         ctx.restore();
                     }
                 }
+
                 // Only do mismatch coloring if a refseq exists to do the comparison
                 if (sequence && blockSeq !== "*") {
                     for (i = 0, len = blockSeq.length; i < len; i++) {
@@ -869,6 +843,24 @@ var igv = (function (igv) {
                             }
                         }
                     }
+                }
+
+                function drawStrandedPolygon(x, y, alignment, doHighlight) {
+
+                    var sign;
+
+                    igv.graphics.fillPolygon(ctx, x, y, { fillStyle: alignmentColor });
+
+                    sign = alignment.strand ? '(+)' : '(-)';
+                    if (doHighlight) {
+                        console.log('drawStrandedPolygon - highlight alignment' + sign);
+                        igv.graphics.strokePolygon(ctx, x, y, { strokeStyle: 'red' });
+                    }
+
+                    if (alignment.mq <= 0) {
+                        igv.graphics.strokePolygon(ctx, x, y, {strokeStyle: outlineColor});
+                    }
+
                 }
             }
         }
