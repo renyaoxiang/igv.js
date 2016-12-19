@@ -47,8 +47,8 @@ var igv = (function (igv) {
         this.alignments = [];
         this.downsampledIntervals = [];
 
-        this.samplingWindowSize = samplingWindowSize === undefined ? 100 : samplingWindowSize;
-        this.samplingDepth = samplingDepth === undefined ? 50 : samplingDepth;
+        this.samplingWindowSize = samplingWindowSize === undefined ? 200 : samplingWindowSize;
+        this.samplingDepth = samplingDepth === undefined ? 100 : samplingDepth;
 
         this.pairsSupported = pairsSupported;
         this.paired = false;  // false until proven otherwise

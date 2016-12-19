@@ -17,8 +17,8 @@ var igv = (function (igv) {
     var SUPPLEMENTARY_FLAG = 0x800;
 
     const MAX_GZIP_BLOCK_SIZE = 65536;   //  APPARENTLY.  Where is this documented???
-    const DEFAULT_SAMPLING_WINDOW_SIZE = 100;
-    const DEFAULT_SAMPLING_DEPTH = 50;
+    const DEFAULT_SAMPLING_WINDOW_SIZE = 200;
+    const DEFAULT_SAMPLING_DEPTH = 100;
     const MAXIMUM_SAMPLING_DEPTH = 2500;
 
     /**

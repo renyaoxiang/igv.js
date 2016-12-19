@@ -490,12 +490,17 @@ var igv = (function (igv) {
                 var buffer,
                     requiredHeight;
 
+
                 // self.loading = false;
                 self.loading = undefined;
 
                 self.stopSpinner();
 
                 if (features) {
+
+                    if (self.trackView.track instanceof igv.BAMTrack) {
+                        console.log('viewport(' + self.genomicState.locusIndex + ').repaint.trackView.track.getFeatures(' + _.size(features.packedAlignmentRows) + ')');
+                    }
 
                     if (typeof self.trackView.track.computePixelHeight === 'function') {
                         requiredHeight = self.trackView.track.computePixelHeight(features);
